@@ -1,0 +1,13 @@
+{
+    "$schema": "../../../schema/server-config.schema.json",
+    "server": {
+        "host": "localhost:8080",
+        "services": [
+            {
+                "path": "/path/to/wms",
+                "type": "WMS",
+                "policy-ref": "policies-wms"
+            }
+        ]
+    }
+}

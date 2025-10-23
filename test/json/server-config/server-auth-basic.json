@@ -1,0 +1,18 @@
+{
+    "$schema": "../../../schema/server-config.schema.json",
+    "server": {
+        "host": "https://mygisserver.example.com",
+        "serverAuth": {
+            "type": "basic",
+            "password": "my-password",
+            "username": "my-username"
+        },
+        "services": [
+            {
+                "path": "/path/to/wms",
+                "type": "WMS",
+                "policy-ref": "policies-wms"
+            }
+        ]
+    }
+}

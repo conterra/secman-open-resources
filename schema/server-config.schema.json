@@ -1,5 +1,10 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "Server-config Schema",
+    "description": "Describe the schema of server-config.json files",
+    "type": "object",
+    "required": ["server"],
+    "additionalProperties": false,
     "properties": {
         "$schema": {
             "type": "string",
@@ -9,6 +14,8 @@
         "server": {
             "type": "object",
             "description": "The configuration for the target server.",
+            "required": ["host", "services"],
+            "additionalProperties": false,
             "properties": {
                 "host": {
                     "type": "string",
@@ -16,38 +23,17 @@
                     "pattern": "(^http[s]?://[^@/]+$)|(\\$\\{.+\\})",
                     "patternErrorMessage": "The host must start with http:// or https:// and must not contain any path, query or user info parameters. The use of environment variables is allowed. Example: `${test.host}`"
                 },
-                "serverAuthn": {
+                "serverAuth": {
                     "type": "object",
                     "description": "The authentication information for the target server.",
-                    "properties": {
-                        "type": {
-                            "type": "string",
-                            "enum": ["basic", "none"],
-                            "enumDescriptions": ["HTTP Basic Authentication", "No Authentication"]
-                        }
-                    },
-                    "required": ["type"],
                     "allOf": [
                         {
-                            "if": {
-                                "properties": { "type": { "const": "basic" } }
-                            },
-                            "then": {
-                                "properties": {
-                                    "username": {
-                                        "type": "string",
-                                        "markdownDescription": "To prevent the username from being stored in plain text, environment variables can be referenced instead: `\"username\": \"${MY_USERNAME}\"`"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "markdownDescription": "To prevent the password from being stored in plain text, environment variables can be referenced instead: `\"password\": \"${MY_PASSWORD}\"`"
-                                    }
-                                },
-                                "required": ["username", "password"]
-                            }
+                            "$ref": "#/definitions/serverAuth-enum"
+                        },
+                        {
+                            "$ref": "#/definitions/serverAuth-condition"
                         }
-                    ],
-                    "unevaluatedProperties": false
+                    ]
                 },
                 "services": {
                     "type": "array",
@@ -55,19 +41,21 @@
                     "minItems": 1,
                     "items": {
                         "type": "object",
+                        "additionalProperties": false,
+                        "required": ["path", "type"],
                         "properties": {
                             "path": {
                                 "type": "string",
-                                "description": "The path of the service on the target server."
+                                "description": "The path of the service on the target server.",
+                                "pattern": "^\/[\\w\\-\/\\.]+$"
                             },
                             "type": {
                                 "type": "string",
                                 "description": "The type of the service.",
-                                "enum": ["FORWARD", "WMS", "WMTS", "WFS"],
+                                "enum": ["FORWARD", "WMS", "WFS"],
                                 "enumDescriptions": [
                                     "no OGC service, just a forward proxy",
                                     "Web Map Service",
-                                    "Web Map Tile Service",
                                     "Web Feature Service"
                                 ]
                             },
@@ -78,29 +66,88 @@
                                 "patternErrorMessage": "The policy-ref must only contain alphanumeric chars and '_-.#@'"
                             }
                         },
-                        "required": ["path", "type"],
                         "allOf": [
-                          {
-                            "if": {
-                              "properties": {
-                                "type": {
-                                  "not": { "const": "FORWARD" }
+                            {
+                                "if": {
+                                    "properties": {
+                                        "type": {
+                                            "not": {
+                                                "const": "FORWARD"
+                                            }
+                                        }
+                                    }
+                                },
+                                "then": {
+                                    "required": ["policy-ref"]
                                 }
-                              }
-                            },
-                            "then": {
-                              "required": ["policy-ref"]
                             }
-                          }
-                        ],
-                        "additionalProperties": false
+                        ]
                     }
                 }
-            },
-            "required": ["host", "services"],
-            "additionalProperties": false
+            }
         }
     },
-    "required": ["server"],
-    "additionalProperties": false
+    "definitions": {
+        "serverAuth-enum": {
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": ["none", "basic"],
+                    "description": "Declares the type of the authentication.",
+                    "markdownEnumDescriptions": [
+                        "No Authentication",
+                        "HTTP Basic Authentication"
+                    ]
+                }
+            }
+        },
+        "serverAuth-condition":{
+            "discriminator": {
+                "propertyName": "type"
+            },
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/serverAuth-type-none"
+                },
+                {
+                    "$ref": "#/definitions/serverAuth-type-basic"
+                }
+            ],
+            "errorMessage": {
+                "discriminator": "\"type\" must be one of \"basic\" or \"none\""
+            }
+        },
+        "serverAuth-type-none": {
+            "type": "object",
+            "required": ["type"],
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "const": "none"
+                }
+            }
+        },
+        "serverAuth-type-basic": {
+            "type": "object",
+            "required": ["type", "username", "password"],
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "const": "basic"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "Username used to authenticate against the target server in plain text.",
+                    "minLength": 1
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Password used to authenticate against the target server in plain text.",
+                    "minLength": 1
+                }
+            }
+        }
+    }
 }
