@@ -1,0 +1,106 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "The URI to the json schema.",
+            "doNotSuggest": true
+        },
+        "server": {
+            "type": "object",
+            "description": "The configuration for the target server.",
+            "properties": {
+                "host": {
+                    "type": "string",
+                    "description": "The host name of the target server.",
+                    "pattern": "(^http[s]?://[^@/]+$)|(\\$\\{.+\\})",
+                    "patternErrorMessage": "The host must start with http:// or https:// and must not contain any path, query or user info parameters. The use of environment variables is allowed. Example: `${test.host}`"
+                },
+                "serverAuthn": {
+                    "type": "object",
+                    "description": "The authentication information for the target server.",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": ["basic", "none"],
+                            "enumDescriptions": ["HTTP Basic Authentication", "No Authentication"]
+                        }
+                    },
+                    "required": ["type"],
+                    "allOf": [
+                        {
+                            "if": {
+                                "properties": { "type": { "const": "basic" } }
+                            },
+                            "then": {
+                                "properties": {
+                                    "username": {
+                                        "type": "string",
+                                        "markdownDescription": "To prevent the username from being stored in plain text, environment variables can be referenced instead: `\"username\": \"${MY_USERNAME}\"`"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "markdownDescription": "To prevent the password from being stored in plain text, environment variables can be referenced instead: `\"password\": \"${MY_PASSWORD}\"`"
+                                    }
+                                },
+                                "required": ["username", "password"]
+                            }
+                        }
+                    ],
+                    "unevaluatedProperties": false
+                },
+                "services": {
+                    "type": "array",
+                    "description": "An array of OGC services that should be protected.",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "path": {
+                                "type": "string",
+                                "description": "The path of the service on the target server."
+                            },
+                            "type": {
+                                "type": "string",
+                                "description": "The type of the service.",
+                                "enum": ["FORWARD", "WMS", "WMTS", "WFS"],
+                                "enumDescriptions": [
+                                    "no OGC service, just a forward proxy",
+                                    "Web Map Service",
+                                    "Web Map Tile Service",
+                                    "Web Feature Service"
+                                ]
+                            },
+                            "policy-ref": {
+                                "type": "string",
+                                "description": "The reference to the policy that should be used for this service.",
+                                "pattern": "^[\\p{L}\\p{N}\\-.#@_]+$",
+                                "patternErrorMessage": "The policy-ref must only contain alphanumeric chars and '_-.#@'"
+                            }
+                        },
+                        "required": ["path", "type"],
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "type": {
+                                  "not": { "const": "FORWARD" }
+                                }
+                              }
+                            },
+                            "then": {
+                              "required": ["policy-ref"]
+                            }
+                          }
+                        ],
+                        "additionalProperties": false
+                    }
+                }
+            },
+            "required": ["host", "services"],
+            "additionalProperties": false
+        }
+    },
+    "required": ["server"],
+    "additionalProperties": false
+}

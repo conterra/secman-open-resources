@@ -1,0 +1,22 @@
+{
+    "name": "policies-schema-ogc",
+    "version": "1.0.0",
+    "description": "json schema for security.manager OGC policies",
+    "scripts": {
+        "test": "mocha --reporter spec"
+    },
+    "repository": {
+    },
+    "keywords": [
+        "json-schema"
+    ],
+    "author": "conterra",
+    "license": "Apache-2.0",
+    "bugs": {
+    },
+    "devDependencies": {
+        "ajv": "^8.12.0",
+        "chai": "^4.3.10",
+        "mocha": "^10.2.0"
+    }
+}
