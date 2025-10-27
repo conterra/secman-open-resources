@@ -15,15 +15,3 @@ Referencing the [policies schema definition files](./schema) in corresponding fi
     - type examples
 
 Please see the test folder more samples [/test/json](./test/json).
-
-## Dev Notes
-
-The package manager PNPM is required for working within this repository.
-See [Installation](https://pnpm.io/installation).
-
-To run tests:
-
-```bash
-$ pnpm install
-$ pnpm test
-```
