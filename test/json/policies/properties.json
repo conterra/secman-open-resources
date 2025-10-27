@@ -1,0 +1,7 @@
+{
+    "$schema": "../../../schema/policies.schema.json",
+    "properties": {
+        "myProp": "xyz",
+        "secondProp2-_3": "abc"
+    }
+}

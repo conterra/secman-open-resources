@@ -1,0 +1,6 @@
+{
+    "$schema": "../../../schema/policies.schema.json",
+    "properties": {
+        "not$allowed": "xyz"
+    }
+}

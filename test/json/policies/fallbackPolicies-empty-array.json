@@ -1,0 +1,8 @@
+{
+    "$schema": "../../../schema/policies.schema.json",
+    "policies": [{
+        "layers": ["layerC"],
+        "roles": ["roleA"]
+    }],
+    "fallbackPolicies": []
+}

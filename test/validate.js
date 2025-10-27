@@ -1,11 +1,18 @@
 const Ajv = require('ajv');
-const schema = require("../schema/server-config.schema.json");
+const serverSchema = require("../schema/server-config.schema.json");
+const policySchema = require("../schema/policies.schema.json");
 const ajv = new Ajv({
     // for vscode schema extensions
     strict: false
 });
-const validate = ajv.compile(schema);
+const validateServer = ajv.compile(serverSchema);
+const validatePolicy = ajv.compile(policySchema);
 
-module.exports = function (data) {
-    return validate(data);
-}
+module.exports = {
+    validateServer: function (data) {
+        return validateServer(data);
+    },
+    validatePolicy: function (data) {
+        return validatePolicy(data);
+    }
+};

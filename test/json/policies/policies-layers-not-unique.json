@@ -1,0 +1,7 @@
+{
+    "$schema": "../../../schema/policies.schema.json",
+    "policies": [{
+        "layers": ["namespace:layer1", "namespace:layer2", "namespace:layer2"],
+        "roles": ["enhancedSecurity_any"]
+    }]
+}

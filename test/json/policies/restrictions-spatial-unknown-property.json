@@ -1,0 +1,15 @@
+{
+    "$schema": "../../../schema/policies.schema.json",
+    "policies": [{
+        "layers": ["0"],
+        "roles": ["enhancedSecurity_anonymous"],
+        "restrictions": ["europe"]
+    }],
+    "restrictions": {
+        "europe": {
+            "type": "spatial",
+            "source": "europe-borders.geojson",
+            "featurequery": "test"
+        }
+    }
+}

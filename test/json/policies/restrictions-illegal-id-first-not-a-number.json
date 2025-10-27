@@ -1,0 +1,8 @@
+{
+    "$schema": "../../../schema/policies.schema.json",
+    "restrictions": {
+        "1notvalidid": {
+            "type": "readonly"
+        }
+    }
+}

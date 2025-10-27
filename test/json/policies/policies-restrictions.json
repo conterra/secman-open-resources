@@ -1,0 +1,8 @@
+{
+    "$schema": "../../../schema/policies.schema.json",
+    "policies": [{
+        "layers": ["0"],
+        "roles": ["enhancedSecurity_anonymous"],
+        "restrictions": ["a-restriction"]
+    }]
+}

@@ -1,0 +1,272 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/conterra/policies-ogc/refs/heads/main/schema/policies.schema.json",
+    "title": "Policies Schema",
+    "description": "Describe the schema of policy files",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "The URI to the json schema.",
+            "doNotSuggest": true
+        },
+        "policies": {
+            "type": "array",
+            "description": "List of policies for a service",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["layers", "roles"],
+                "properties": {
+                    "layers": {
+                        "$ref": "#/definitions/policy-layers-type"
+                    },
+                    "roles": {
+                        "$ref": "#/definitions/policy-roles-type"
+                    },
+                    "restrictions": {
+                        "$ref": "#/definitions/policy-restrictions-type"
+                    }
+                }
+            }
+        },
+        "fallbackPolicies": {
+            "type": "array",
+            "description": "List of fallback policies that are applied when no other policy can be found for the roles of a person.",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["layers"],
+                "properties": {
+                    "layers": {
+                        "$ref": "#/definitions/policy-layers-type"
+                    },
+                    "restrictions": {
+                        "$ref": "#/definitions/policy-restrictions-type"
+                    }
+                }
+            }
+        },
+        "restrictions": {
+            "type": "object",
+            "description": "Enumeration of restrictions by name. Can be referenced by policies.",
+            "propertyNames": {
+                "$ref": "#/definitions/id-name"
+            },
+            "additionalProperties": {
+                "$ref": "#/definitions/restriction-type"
+            },
+            "examples": [{}]
+        },
+        "properties": {
+            "$ref": "#/definitions/properties-type"
+        }
+    },
+    "definitions": {
+        "policy-layers-type": {
+            "type": "array",
+            "description": "Layers to which access is to be granted.",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "anyOf": [
+                    {
+                        "$ref": "#/definitions/non-empty-string-or-reference",
+                        "defaultSnippets": [
+                            {
+                                "label": "Layer Name...",
+                                "body": "${1:name}"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "string",
+                        "enum": ["*"],
+                        "markdownEnumDescriptions": ["Allow access to *any* layer."]
+                    }
+                ]
+            }
+        },
+        "policy-roles-type": {
+            "type": "array",
+            "description": "Roles to which the policies applies.",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "anyOf": [
+                    {
+                        "$ref": "#/definitions/non-empty-string-or-reference",
+                        "defaultSnippets": [
+                            {
+                                "label": "Role name...",
+                                "body": "${1:rolename}"
+                            }
+                        ]
+                    },
+                    {
+                        "$ref": "#/definitions/known-roles-type"
+                    }
+                ]
+            }
+        },
+        "known-roles-type": {
+            "type": "string",
+            "enum": ["enhancedSecurity_any", "enhancedSecurity_anonymous", "enhancedSecurity_authenticated"],
+            "markdownEnumDescriptions": [
+                "Any user, even users not signed in.",
+                "Any user not signed in.",
+                "Any user signed in."
+            ]
+        },
+        "policy-restrictions-type": {
+            "type": "array",
+            "description": "Further restrictions on the layers for the given roles.",
+            "uniqueItems": true,
+            "items": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "restriction-type": {
+            "allOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": ["spatial", "readonly"],
+                            "description": "Declares the type of the restriction.",
+                            "markdownEnumDescriptions": [
+                                "A spatial restriction.",
+                                "A readonly restriction."
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "discriminator": {
+                        "propertyName": "type"
+                    },
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/spatial-restriction-type"
+                        },
+                        {
+                            "$ref": "#/definitions/readonly-restriction-type"
+                        }
+                    ],
+                    "errorMessage": {
+                        "discriminator": "\"type\" must be one of \"spatial\" or \"readonly\""
+                    }
+                }
+            ]
+        },
+        "spatial-restriction-type": {
+            "type": "object",
+            "description": "A spatial restriction limiting access to a certain area.",
+            "required": ["type", "source"],
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "const": "spatial"
+                },
+                "source": {
+                    "type": "string",
+                    "pattern": "^[\\p{L}\\p{N}\\-.#@_]+(\\.(geo)?json)$",
+                    "errorMessage":  "\"source\" must be a file name with file ending \".geojson\" or \".json\". Allowed characters: letters, numbers, '-', '.', '#', '@' and '_'"
+                },
+                "spatialOperation": {
+                    "type": "string",
+                    "description": "WFS only: Spatial operation for comparing the geometries with the features of a feature type.",
+                    "enum": ["intersect", "within"],
+                    "markdownDescription": [
+                        "All features that intersect the geometry are returned. This is the default value.",
+                        "Only features that lie completely within the geometry are returned."
+                    ]
+                }
+            },
+            "defaultSnippets": [{
+                "label": "Spatial restriction...",
+                "description": "Adds a new spatial restriction limiting access to a certain area.",
+                "body": {
+                    "type": "spatial",
+                    "source": "${1:file-name}.geojson"
+                }
+            }]
+        },
+        "readonly-restriction-type": {
+            "type": "object",
+            "description": "A restriction denying 'edit' operations on WFS-T.",
+            "additionalProperties": false,
+            "required": ["type"],
+            "defaultSnippets": [
+                {
+                    "label": "Readonly restriction...",
+                    "description": "Adds a new readonly restriction denying 'edit' operations on WFS-T.",
+                    "body": {
+                        "type": "readonly"
+                    }
+                }
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "const": "readonly"
+                }
+            }
+        },
+        "properties-type": {
+            "type": "object",
+            "description": "Enumeration of properties. Can be referenced as '${property_key}' in other values.",
+            "markdownDescription": "Enumeration of properties. Can be referenced as `${property_key}` in other values.",
+            "additionalProperties": {
+                "type": "string",
+                "description": "A property that can  be referenced as '${property_key}' in other values.",
+                "markdownDescription": "A property that can be referenced as `${property_key}` in other values."
+            },
+            "propertyNames": {
+                "$ref": "#/definitions/id-name"
+            },
+            "defaultSnippets": [
+                {
+                    "label": "New property...",
+                    "body": {
+                        "${1:key}": "${2:value}"
+                    }
+                }
+            ],
+            "examples": [{}]
+        },
+        "id-name": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
+            "patternErrorMessage": "Key must start with a letter. Additionally allowed characters: a-z, A-Z, 0-9, '_', '-'"
+        },
+        "property-replacement-value": {
+            "type": "string",
+            "pattern": "^\\$\\{[A-Za-z][A-Za-z0-9_.-]*\\}$",
+            "defaultSnippets": [
+                {
+                    "label": "Property reference...",
+                    "markdownDescription": "Reference to a value defined as property.",
+                    "body": "${${1:property_key}}"
+                }
+            ]
+        },
+        "non-empty-string-or-reference": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "minLength": 1
+                },
+                {
+                    "$ref": "#/definitions/property-replacement-value"
+                }
+            ]
+        }
+    }
+}

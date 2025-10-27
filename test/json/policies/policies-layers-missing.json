@@ -1,0 +1,6 @@
+{
+    "$schema": "../../../schema/policies.schema.json",
+    "policies": [{
+        "roles": ["enhancedSecurity_any"]
+    }]
+}

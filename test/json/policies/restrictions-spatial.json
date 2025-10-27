@@ -1,0 +1,24 @@
+{
+    "$schema": "../../../schema/policies.schema.json",
+    "policies": [{
+        "layers": ["0"],
+        "roles": ["enhancedSecurity_anonymous"],
+        "restrictions": ["europe"]
+    }],
+    "restrictions": {
+        "europe": {
+            "type": "spatial",
+            "source": "europe-borders.geojson"
+        },
+        "asia": {
+            "type": "spatial",
+            "source": "asia-borders.json",
+            "spatialOperation": "within"
+        },
+        "africa": {
+            "type": "spatial",
+            "source": "africa-borders.geojson",
+            "spatialOperation": "intersect"
+        }
+    }
+}

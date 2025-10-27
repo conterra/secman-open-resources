@@ -1,0 +1,13 @@
+{
+    "$schema": "../../../schema/policies.schema.json",
+    "policies": [{
+        "layers": ["namespace:layer1", "layer2"],
+        "roles": ["enhancedSecurity_any"]
+    },{
+        "layers": ["*"],
+        "roles": ["enhancedSecurity_authenticated"]
+    },{
+        "layers": ["layerA"],
+        "roles": ["enhancedSecurity_anonymous", "roleA", "${role_property}"]
+    }]
+}
