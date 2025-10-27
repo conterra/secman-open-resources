@@ -118,6 +118,9 @@ describe("policies.schema.json", function () {
     it("should not accept unknown property", function() {
         assert.isFalse(validatePolicy(require("./json/policies/unknown-property.json")))
     });
+    it("should accept property replacements", function() {
+        assert.isTrue(validatePolicy(require("./json/policies/property-replacement.json")))
+    });
     it("should accept a file only with policies", function() {
         assert.isTrue(validatePolicy(require("./json/policies/only-policies.json")))
     });

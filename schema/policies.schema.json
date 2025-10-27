@@ -176,8 +176,12 @@
                 },
                 "source": {
                     "type": "string",
-                    "pattern": "^[\\p{L}\\p{N}\\-.#@_]+(\\.(geo)?json)$",
-                    "errorMessage":  "\"source\" must be a file name with file ending \".geojson\" or \".json\". Allowed characters: letters, numbers, '-', '.', '#', '@' and '_'"
+                    "anyOf": [{
+                        "pattern": "^[\\p{L}\\p{N}\\-.#@_]+(\\.(geo)?json)$",
+                        "errorMessage":  "\"source\" must be a file name with file ending \".geojson\" or \".json\". Allowed characters: letters, numbers, '-', '.', '#', '@' and '_'"
+                    }, {
+                        "$ref": "#/definitions/property-replacement-value"
+                    }]
                 },
                 "spatialOperation": {
                     "type": "string",
