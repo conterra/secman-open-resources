@@ -24,7 +24,7 @@ For policy files, use:
 
 ```json
 {
-    "$schema": "https://raw.githubusercontent.com/conterra/secman-open-resources/refs/tags/1.0.0/schema/policies.schema.json"
+    "$schema": "https://raw.githubusercontent.com/conterra/secman-open-resources/1.0.0/schema/policies.schema.json"
 }
 ```
 
@@ -32,6 +32,6 @@ For server configuration files, use:
 
 ```json
 {
-    "$schema": "https://raw.githubusercontent.com/conterra/secman-open-resources/refs/tags/1.0.0/schema/server-config.schema.json"
+    "$schema": "https://raw.githubusercontent.com/conterra/secman-open-resources/1.0.0/schema/server-config.schema.json"
 }
 ```
