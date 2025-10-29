@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/conterra/policies-ogc/refs/heads/main/schema/server-config.schema.json",
+    "$id": "https://raw.githubusercontent.com/conterra/secman-open-resources/refs/tags/1.0.0/schema/server-config.schema.json",
     "title": "Server-config Schema",
     "description": "Describe the schema of server-config.json files",
     "type": "object",
@@ -48,7 +48,7 @@
                             "path": {
                                 "type": "string",
                                 "description": "The path of the service on the target server.",
-                                "pattern": "^\/[\\w\\-\/\\.]+$"
+                                "pattern": "^/[\\w\\-/\\.]+$"
                             },
                             "type": {
                                 "type": "string",
@@ -95,14 +95,11 @@
                     "type": "string",
                     "enum": ["none", "basic"],
                     "description": "Declares the type of the authentication.",
-                    "markdownEnumDescriptions": [
-                        "No Authentication",
-                        "HTTP Basic Authentication"
-                    ]
+                    "markdownEnumDescriptions": ["No Authentication", "HTTP Basic Authentication"]
                 }
             }
         },
-        "serverAuth-condition":{
+        "serverAuth-condition": {
             "discriminator": {
                 "propertyName": "type"
             },

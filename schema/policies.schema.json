@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/conterra/policies-ogc/refs/heads/main/schema/policies.schema.json",
+    "$id": "https://raw.githubusercontent.com/conterra/secman-open-resources/refs/tags/1.0.0/schema/policies.schema.json",
     "title": "Policies Schema",
     "description": "Describe the schema of policy files",
     "type": "object",
@@ -138,10 +138,7 @@
                             "type": "string",
                             "enum": ["spatial", "readonly"],
                             "description": "Declares the type of the restriction.",
-                            "markdownEnumDescriptions": [
-                                "A spatial restriction.",
-                                "A readonly restriction."
-                            ]
+                            "markdownEnumDescriptions": ["A spatial restriction.", "A readonly restriction."]
                         }
                     }
                 },
@@ -176,12 +173,15 @@
                 },
                 "source": {
                     "type": "string",
-                    "anyOf": [{
-                        "pattern": "^[\\p{L}\\p{N}\\-.#@_]+(\\.(geo)?json)$",
-                        "errorMessage":  "\"source\" must be a file name with file ending \".geojson\" or \".json\". Allowed characters: letters, numbers, '-', '.', '#', '@' and '_'"
-                    }, {
-                        "$ref": "#/definitions/property-replacement-value"
-                    }]
+                    "anyOf": [
+                        {
+                            "pattern": "^[\\p{L}\\p{N}\\-.#@_]+(\\.(geo)?json)$",
+                            "errorMessage": "\"source\" must be a file name with file ending \".geojson\" or \".json\". Allowed characters: letters, numbers, '-', '.', '#', '@' and '_'"
+                        },
+                        {
+                            "$ref": "#/definitions/property-replacement-value"
+                        }
+                    ]
                 },
                 "spatialOperation": {
                     "type": "string",
@@ -193,14 +193,16 @@
                     ]
                 }
             },
-            "defaultSnippets": [{
-                "label": "Spatial restriction...",
-                "description": "Adds a new spatial restriction limiting access to a certain area.",
-                "body": {
-                    "type": "spatial",
-                    "source": "${1:file-name}.geojson"
+            "defaultSnippets": [
+                {
+                    "label": "Spatial restriction...",
+                    "description": "Adds a new spatial restriction limiting access to a certain area.",
+                    "body": {
+                        "type": "spatial",
+                        "source": "${1:file-name}.geojson"
+                    }
                 }
-            }]
+            ]
         },
         "readonly-restriction-type": {
             "type": "object",

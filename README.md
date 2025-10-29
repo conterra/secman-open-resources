@@ -15,3 +15,23 @@ Referencing the [policies schema definition files](./schema) in corresponding fi
     - type examples
 
 Please see the test folder more samples [/test/json](./test/json).
+
+## Usage in Editors
+
+Editors with support for JSON schema validation (such as Visual Studio Code) can reference the schema files within this repository by configuring the `$schema` property.
+
+For policy files, use:
+
+```json
+{
+    "$schema": "https://raw.githubusercontent.com/conterra/secman-open-resources/refs/tags/1.0.0/schema/policies.schema.json"
+}
+```
+
+For server configuration files, use:
+
+```json
+{
+    "$schema": "https://raw.githubusercontent.com/conterra/secman-open-resources/refs/tags/1.0.0/schema/server-config.schema.json"
+}
+```
