@@ -142,7 +142,7 @@
                 },
                 "password": {
                     "type": "string",
-                    "description": "Password used to authenticate against the target server in plain text.",
+                    "markdownDescription": "Password used to authenticate against the target server in plain text.\n\n**NOTE:** We recommend referencing environment properties or application properties here to keep the actual password hidden. Example: `${secured.server.password}`.",
                     "minLength": 1
                 }
             }
