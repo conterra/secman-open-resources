@@ -1,4 +1,4 @@
-import { validateServer, validatePolicy, newValidateServer, ValidateResult } from "./validate";
+import { validatePolicy, newValidateServer, ValidateResult } from "./validate";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, it, assert, expect } from "vitest";
@@ -75,13 +75,17 @@ describe("server-config.schema.json", function () {
     });
     it("should not accept serverAuth basic with missing password", function () {
         const result = newValidateServer(getJson("./json/server-config/server-auth-basic-missing-password.json"));
-        expect(getErrors(result)).toMatchInlineSnapshot(`""serverAuthn" property must have required property "password""`);
+        expect(getErrors(result)).toMatchInlineSnapshot(
+            `""serverAuthn" property must have required property "password""`
+        );
     });
     it("should not accept serverAuth basic with missing attributes", function () {
         const result = newValidateServer(
             getJson("./json/server-config/server-auth-basic-missing-password-username.json")
         );
-        expect(getErrors(result)).toMatchInlineSnapshot(`""serverAuthn" property must have required property "username""`);
+        expect(getErrors(result)).toMatchInlineSnapshot(
+            `""serverAuthn" property must have required property "username""`
+        );
     });
     it("should not accept serverAuth basic with additional attributes", function () {
         const result = newValidateServer(getJson("./json/server-config/server-auth-basic-additional-property.json"));
@@ -153,7 +157,9 @@ describe("server-config.schema.json", function () {
     });
     it("should not accept an invalid service type", function () {
         const result = newValidateServer(getJson("./json/server-config/services-type-invalid.json"));
-        expect(getErrors(result)).toMatchInlineSnapshot(`""type" property must be equal to one of the allowed values: "FORWARD", "WMS", "WFS""`);
+        expect(getErrors(result)).toMatchInlineSnapshot(
+            `""type" property must be equal to one of the allowed values: "FORWARD", "WMS", "WFS""`
+        );
     });
     it("should accept service type WFS", function () {
         const result = newValidateServer(getJson("./json/server-config/services-type-wfs.json"));

@@ -38,11 +38,6 @@ export function newValidatePolicy(data: unknown): ValidateResult {
 }
 
 // TODO: Remove this when no longer used in tests
-export function validateServer(data: unknown) {
-    return validateServerImpl(data);
-}
-
-// TODO: Remove this when no longer used in tests
 export function validatePolicy(data: unknown) {
     return validatePolicyImpl(data);
 }
