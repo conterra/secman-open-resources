@@ -8,7 +8,8 @@
         "services": [
             {
                 "path": "",
-                "type": "WMS"
+                "type": "WMS",
+                "policy-ref": "foo"
             }
         ]
     }

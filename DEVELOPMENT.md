@@ -9,7 +9,8 @@ To run tests:
 
 ```bash
 $ pnpm install
-$ pnpm test
+$ pnpm test     # watch / interactive
+$ pnpm test run # batch mode
 ```
 
 ## Releasing Steps

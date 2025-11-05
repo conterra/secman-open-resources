@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "json schema for security.manager OGC policies",
     "scripts": {
-        "test": "mocha --reporter spec"
+        "test": "vitest"
     },
     "repository": {},
     "keywords": [
@@ -13,9 +13,11 @@
     "license": "Apache-2.0",
     "bugs": {},
     "devDependencies": {
+        "@stoplight/better-ajv-errors": "^1.0.3",
+        "@types/node": "^24.10.0",
         "ajv": "^8.17.1",
-        "chai": "^6.2.0",
-        "mocha": "^11.7.4"
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.7"
     },
     "engines": {
         "pnpm": ">= 10.0.0"
