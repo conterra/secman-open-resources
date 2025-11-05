@@ -24,15 +24,15 @@
                     "pattern": "(^http[s]?://[^@/]+$)|(\\$\\{.+\\})",
                     "patternErrorMessage": "The host must start with http:// or https:// and must not contain any path, query or user info parameters. The use of environment variables is allowed. Example: `${test.host}`"
                 },
-                "serverAuth": {
+                "serverAuthn": {
                     "type": "object",
                     "description": "The authentication information for the target server.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/serverAuth-enum"
+                            "$ref": "#/definitions/serverAuthn-enum"
                         },
                         {
-                            "$ref": "#/definitions/serverAuth-condition"
+                            "$ref": "#/definitions/serverAuthn-condition"
                         }
                     ]
                 },
@@ -89,7 +89,7 @@
         }
     },
     "definitions": {
-        "serverAuth-enum": {
+        "serverAuthn-enum": {
             "properties": {
                 "type": {
                     "type": "string",
@@ -99,23 +99,23 @@
                 }
             }
         },
-        "serverAuth-condition": {
+        "serverAuthn-condition": {
             "discriminator": {
                 "propertyName": "type"
             },
             "oneOf": [
                 {
-                    "$ref": "#/definitions/serverAuth-type-none"
+                    "$ref": "#/definitions/serverAuthn-type-none"
                 },
                 {
-                    "$ref": "#/definitions/serverAuth-type-basic"
+                    "$ref": "#/definitions/serverAuthn-type-basic"
                 }
             ],
             "errorMessage": {
                 "discriminator": "\"type\" must be one of \"basic\" or \"none\""
             }
         },
-        "serverAuth-type-none": {
+        "serverAuthn-type-none": {
             "type": "object",
             "required": ["type"],
             "additionalProperties": false,
@@ -126,7 +126,7 @@
                 }
             }
         },
-        "serverAuth-type-basic": {
+        "serverAuthn-type-basic": {
             "type": "object",
             "required": ["type", "username", "password"],
             "additionalProperties": false,
