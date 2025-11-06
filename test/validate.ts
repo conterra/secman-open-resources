@@ -23,14 +23,14 @@ export interface ErrorResult {
 
 export type ValidateResult = OkResult | ErrorResult;
 
-export function newValidateServer(data: unknown): ValidateResult {
+export function validateServer(data: unknown): ValidateResult {
     if (validateServerImpl(data)) {
         return { valid: true };
     }
     return getErrorResult(serverSchema, data, validateServerImpl);
 }
 
-export function newValidatePolicy(data: unknown): ValidateResult {
+export function validatePolicy(data: unknown): ValidateResult {
     if (validatePolicyImpl(data)) {
         return { valid: true };
     }
