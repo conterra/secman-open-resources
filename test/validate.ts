@@ -37,11 +37,6 @@ export function newValidatePolicy(data: unknown): ValidateResult {
     return getErrorResult(policySchema, data, validatePolicyImpl);
 }
 
-// TODO: Remove this when no longer used in tests
-export function validatePolicy(data: unknown) {
-    return validatePolicyImpl(data);
-}
-
 function getErrorResult(schema: unknown, data: unknown, fn: ValidateFunction): ErrorResult {
     const output = betterAjvErrors(schema, fn.errors, {
         propertyPath: [],

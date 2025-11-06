@@ -1,7 +1,7 @@
-import { validatePolicy, newValidateServer, ValidateResult } from "./validate";
+import { newValidateServer, newValidatePolicy, ValidateResult } from "./validate";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { describe, it, assert, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 
 describe("server-config.schema.json", function () {
     it("should accept a config with multiple services", function () {
@@ -173,121 +173,227 @@ describe("server-config.schema.json", function () {
 
 describe("policies.schema.json", function () {
     it("should accept an empty file", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/empty.json")));
+        const result = newValidatePolicy(getJson("./json/policies/empty.json"));
+        expect(result.valid).toBe(true);
     });
     it("should not accept unknown property", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/unknown-property.json")));
+        const result = newValidatePolicy(getJson("./json/policies/unknown-property.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`"Property "unknown" is not expected to be here"`);
     });
     it("should accept property replacements", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/property-replacement.json")));
+        const result = newValidatePolicy(getJson("./json/policies/property-replacement.json"));
+        expect(result.valid).toBe(true);
     });
     it("should accept a file only with policies", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/only-policies.json")));
+        const result = newValidatePolicy(getJson("./json/policies/only-policies.json"));
+        expect(result.valid).toBe(true);
     });
     it("should accept a file only with fallbackPolicies", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/only-fallbackPolicies.json")));
+        const result = newValidatePolicy(getJson("./json/policies/only-fallbackPolicies.json"));
+        expect(result.valid).toBe(true);
     });
     it("should accept a file only with restrictions", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/only-restrictions.json")));
+        const result = newValidatePolicy(getJson("./json/policies/only-restrictions.json"));
+        expect(result.valid).toBe(true);
     });
     it("should not accept an empty policies array", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/policies-empty.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-empty.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`""policies" property must not have fewer than 1 items"`);
     });
     it("should not accept policies with unknown properties", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/policies-unknown-property.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-unknown-property.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`"Property "unknown" is not expected to be here"`);
     });
     it("should not accept a policy with missing layers", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/policies-layers-missing.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-layers-missing.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`""0" property must have required property "layers""`);
     });
     it("should not accept a policy with empty layers array", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/policies-layers-empty-array.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-layers-empty-array.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`""layers" property must not have fewer than 1 items"`);
     });
+
     it("should not accept a policy with empty layers value", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/policies-layers-empty-value.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-layers-empty-value.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`
+          ""0" property must not have fewer than 1 characters
+          "0" property must match pattern "^\\$\\{[A-Za-z][A-Za-z0-9_.-]*\\}$"
+          "0" property must match a schema in anyOf
+          "0" property must be equal to one of the allowed values
+          "0" property must match a schema in anyOf"
+        `);
     });
+
     it("should not accept a policy with duplicate layer items", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/policies-layers-not-unique.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-layers-not-unique.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(
+            `""layers" property must not have duplicate items (items ## 1 and 2 are identical)"`
+        );
     });
+
     it("should not accept a policy with missing roles", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/policies-roles-missing.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-roles-missing.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`""0" property must have required property "roles""`);
     });
+
     it("should not accept a policy with empty roles array", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/policies-roles-empty-array.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-roles-empty-array.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`""roles" property must not have fewer than 1 items"`);
     });
+
     it("should not accept a policy with empty roles value", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/policies-roles-empty-value.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-roles-empty-value.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`
+          ""0" property must not have fewer than 1 characters
+          "0" property must match pattern "^\\$\\{[A-Za-z][A-Za-z0-9_.-]*\\}$"
+          "0" property must match a schema in anyOf
+          "0" property must be equal to one of the allowed values
+          "0" property must match a schema in anyOf"
+        `);
     });
+
     it("should accept a policy with valid restriction reference", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/policies-restrictions.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-restrictions.json"));
+        expect(result.valid).toBe(true);
     });
+
     it("should accept a policy with an empty restriction reference array", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/policies-restrictions-empty-array.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-restrictions-empty-array.json"));
+        expect(result.valid).toBe(true);
     });
+
     it("should not accept a policy with an empty restriction reference value", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/policies-restrictions-empty-value.json")));
+        const result = newValidatePolicy(getJson("./json/policies/policies-restrictions-empty-value.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`""0" property must not have fewer than 1 characters"`);
     });
+
     it("should accept fallbackPolicies with empty array", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/fallbackPolicies-empty-array.json")));
+        const result = newValidatePolicy(getJson("./json/policies/fallbackPolicies-empty-array.json"));
+        expect(result.valid).toBe(true);
     });
+
     it("should not accept fallbackPolicies with missing layers", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/fallbackPolicies-missing-layers.json")));
+        const result = newValidatePolicy(getJson("./json/policies/fallbackPolicies-missing-layers.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`""0" property must have required property "layers""`);
     });
+
     it("should not accept fallbackPolicies with roles", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/fallbackPolicies-with-roles.json")));
+        const result = newValidatePolicy(getJson("./json/policies/fallbackPolicies-with-roles.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`"Property "roles" is not expected to be here"`);
     });
+
     it("should accept fallbackPolicies and policies", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/fallbackPolicies-and-policies.json")));
+        const result = newValidatePolicy(getJson("./json/policies/fallbackPolicies-and-policies.json"));
+        expect(result.valid).toBe(true);
     });
+
     it("should not accept fallbackPolicies with unknown property", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/fallbackPolicies-unknown-property.json")));
+        const result = newValidatePolicy(getJson("./json/policies/fallbackPolicies-unknown-property.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`"Property "unknown" is not expected to be here"`);
     });
+
     it("should not accept spatial restrictions with source without file endings", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/restrictions-spatial-source-no-file-ending.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-spatial-source-no-file-ending.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`
+          ""source" property must match pattern "^[\\p{L}\\p{N}\\-.#@_]+(\\.(geo)?json)$"
+          "source" property must match pattern "^\\$\\{[A-Za-z][A-Za-z0-9_.-]*\\}$"
+          "source" property must match a schema in anyOf"
+          `);
     });
+
     it("should not accept spatial restrictions without source", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/restrictions-spatial-source-missing.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-spatial-source-missing.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`""europe" property must have required property "source""`);
     });
+
     it("should not accept spatial restrictions with a path to the source", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/restrictions-spatial-source-with-path.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-spatial-source-with-path.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`
+          ""source" property must match pattern "^[\\p{L}\\p{N}\\-.#@_]+(\\.(geo)?json)$"
+          "source" property must match pattern "^\\$\\{[A-Za-z][A-Za-z0-9_.-]*\\}$"
+          "source" property must match a schema in anyOf"
+          `);
     });
+
     it("should not accept spatial restrictions with unknown spatialOperation", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/restrictions-spatial-spatialOperation-unknown.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-spatial-spatialOperation-unknown.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(
+            `""spatialOperation" property must be equal to one of the allowed values: "intersect", "within""`
+        );
     });
+
     it("should not accept spatial restrictions with unknown property", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/restrictions-spatial-unknown-property.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-spatial-unknown-property.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`"Property "featurequery" is not expected to be here"`);
     });
+
     it("should accept spatial restrictions", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/restrictions-spatial.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-spatial.json"));
+        expect(result.valid).toBe(true);
     });
+
     it("should accept readonly restrictions", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/restrictions-readonly.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-readonly.json"));
+        expect(result.valid).toBe(true);
     });
+
     it("should not accept readonly restrictions with unknown properties", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/restrictions-readonly-unknown-property.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-readonly-unknown-property.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`"Property "layers" is not expected to be here"`);
     });
+
     it("should not accept restrictions with unknown type", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/restrictions-type-unknown.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-type-unknown.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(
+            `""type" property must be equal to one of the allowed values: "spatial", "readonly""`
+        );
     });
+
     it("should not accept restrictions with missing type", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/restrictions-type-missing.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-type-missing.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`""europe" property tag "type" must be string"`);
     });
+
     it("should not accept restrictions with illegal character", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/restrictions-illegal-character.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-illegal-character.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`
+          ""restrictions" property must match pattern "^[A-Za-z][A-Za-z0-9_-]*$"
+          "restrictions" property property name must be valid"
+        `);
     });
+
     it("should not accept restrictions with illegal id (starting with a number)", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/restrictions-illegal-id-first-not-a-number.json")));
+        const result = newValidatePolicy(getJson("./json/policies/restrictions-illegal-id-first-not-a-number.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`
+          ""restrictions" property must match pattern "^[A-Za-z][A-Za-z0-9_-]*$"
+          "restrictions" property property name must be valid"
+        `);
     });
+
     it("should accept a properties section", function () {
-        assert.isTrue(validatePolicy(getJson("./json/policies/properties.json")));
+        const result = newValidatePolicy(getJson("./json/policies/properties.json"));
+        expect(result.valid).toBe(true);
     });
+
     it("should not accept a properties section with number values", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/properties-invalid-number-values.json")));
+        const result = newValidatePolicy(getJson("./json/policies/properties-invalid-number-values.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`""numbersNotAllowed" property type must be string"`);
     });
+
     it("should not accept a properties section with keys starting with number values", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/properties-invalid-starting-number.json")));
+        const result = newValidatePolicy(getJson("./json/policies/properties-invalid-starting-number.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`
+          ""properties" property must match pattern "^[A-Za-z][A-Za-z0-9_-]*$"
+          "properties" property property name must be valid"
+        `);
     });
+
     it("should not accept a properties section with keys using invalid keys", function () {
-        assert.isFalse(validatePolicy(getJson("./json/policies/properties-invalid-character-in-key.json")));
+        const result = newValidatePolicy(getJson("./json/policies/properties-invalid-character-in-key.json"));
+        expect(getErrors(result)).toMatchInlineSnapshot(`
+          ""properties" property must match pattern "^[A-Za-z][A-Za-z0-9_-]*$"
+          "properties" property property name must be valid"
+        `);
     });
 });
 
