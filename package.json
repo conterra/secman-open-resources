@@ -1,7 +1,7 @@
 {
     "name": "policies-schema-ogc",
     "version": "1.0.0",
-    "description": "json schema for security.manager OGC policies",
+    "description": "security.manager for OGC schema files",
     "scripts": {
         "test": "vitest"
     },

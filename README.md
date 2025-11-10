@@ -1,7 +1,7 @@
-# Schema files for security.manager OGC
+# security.manager for OGC schema files
 
-The policies schema defines the [JSON schema](https://json-schema.org/) used for service access policies in security.manager OGC.
-The server config schema defines the [JSON schema](https://json-schema.org/) used for server config in security.manager OGC.
+The policies schema defines the [JSON schema](https://json-schema.org/) used for service access policies in security.manager for OGC.
+The server config schema defines the [JSON schema](https://json-schema.org/) used for server config in security.manager for OGC.
 
 Referencing the [policies schema definition files](./schema) in corresponding files serves two purposes:
 
@@ -16,7 +16,7 @@ Referencing the [policies schema definition files](./schema) in corresponding fi
 
 Please see the test folder more samples [/test/json](./test/json).
 
-## Usage in Editors
+## Usage in editors
 
 Editors with support for JSON schema validation (such as Visual Studio Code) can reference the schema files within this repository by configuring the `$schema` property.
 
